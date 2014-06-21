@@ -1,4 +1,4 @@
-package demo.oauth2.authentication.resources;
+package com.mycompany.apps.oauth2.authentication.resources;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

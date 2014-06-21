@@ -33,7 +33,7 @@
         <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
         <init-param>
             <param-name>com.sun.jersey.config.property.packages</param-name>
-            <param-value>demo.oauth2.authentication.resources</param-value>
+            <param-value>com.mycompany.apps.oauth2.authentication.resources</param-value>
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>

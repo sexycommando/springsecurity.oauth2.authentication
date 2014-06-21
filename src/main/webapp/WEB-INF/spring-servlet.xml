@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:context="http://www.springframework.org/schema/context"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
        xmlns:sec="http://www.springframework.org/schema/security"
@@ -10,107 +11,177 @@
                            http://www.springframework.org/schema/mvc/spring-mvc-3.2.xsd
 		                   http://www.springframework.org/schema/security
                            http://www.springframework.org/schema/security/spring-security-3.2.xsd
+                           http://www.springframework.org/schema/context
+                           http://www.springframework.org/schema/context/spring-context-3.2.xsd
 		                   http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans-3.2.xsd ">
 
-    <http pattern="/oauth/token" create-session="stateless"
-          authentication-manager-ref="authenticationManager"
-          xmlns="http://www.springframework.org/schema/security" >
-        <intercept-url pattern="/oauth/token" access="IS_AUTHENTICATED_FULLY" />
+    <http pattern="/resources/**" create-session="never"
+          entry-point-ref="myOAuthAuthenticationEntryPoint"
+          authentication-manager-ref="myOAuth2AuthenticationManager"
+          access-decision-manager-ref="accessDecisionManager"
+          xmlns="http://www.springframework.org/schema/security">
         <anonymous enabled="false" />
-        <http-basic entry-point-ref="clientAuthenticationEntryPoint" />
-        <custom-filter ref="clientCredentialsTokenEndpointFilter" before="BASIC_AUTH_FILTER" />
+        <!--<intercept-url pattern="/resources/**" method="GET" />-->
+        <intercept-url pattern="/resources/**" access="SCOPE_TRUST" />
+        <custom-filter ref="myOauth2ProviderFilter" before="PRE_AUTH_FILTER" />
         <access-denied-handler ref="oauthAccessDeniedHandler" />
     </http>
 
-    <http pattern="/resources/**" create-session="never"
-          entry-point-ref="oauthAuthenticationEntryPoint"
+    <http pattern="/oauth/token" create-session="stateless"
+          entry-point-ref="myOAuthAuthenticationEntryPoint"
+          authentication-manager-ref="myClientAuthenticationManager"
           xmlns="http://www.springframework.org/schema/security">
+        <intercept-url pattern="/oauth/token" access="IS_AUTHENTICATED_FULLY" />
         <anonymous enabled="false" />
-        <intercept-url pattern="/resources/**" method="GET" />
-        <custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER" />
+        <custom-filter ref="myClientCredentialsTokenEndpointFilter" before="BASIC_AUTH_FILTER" />
         <access-denied-handler ref="oauthAccessDeniedHandler" />
+        <!--<http-basic entry-point-ref="clientAuthenticationEntryPoint" />-->
     </http>
 
     <http pattern="/logout" create-session="never"
-          entry-point-ref="oauthAuthenticationEntryPoint"
+          entry-point-ref="myOAuthAuthenticationEntryPoint"
           xmlns="http://www.springframework.org/schema/security">
         <anonymous enabled="false" />
         <intercept-url pattern="/logout" method="GET" />
-        <sec:logout invalidate-session="true" logout-url="/logout" success-handler-ref="logoutSuccessHandler" />
-        <custom-filter ref="resourceServerFilter" before="PRE_AUTH_FILTER" />
+        <!--<sec:logout invalidate-session="true" logout-url="/logout" success-handler-ref="logoutSuccessHandler" />-->
+        <custom-filter ref="myOauth2ProviderFilter" before="PRE_AUTH_FILTER" />
         <access-denied-handler ref="oauthAccessDeniedHandler" />
     </http>
 
-    <bean id="logoutSuccessHandler" class="demo.oauth2.authentication.security.LogoutImpl" >
-        <property name="tokenstore" ref="tokenStore"></property>
+    <!-- 連携アプリ設定 -->
+    <oauth:client-details-service id="myClientDetailsService" >
+        <oauth:client client-id="my-auth"
+                      secret="pass123"
+                      scope="trust"
+                      authorized-grant-types="authorization_code,implicit,password,client_credentials,refresh_token"
+                      authorities="ROLE_CLIENT"
+                      resource-ids="myResource" />
+    </oauth:client-details-service>
+
+    <!-- 権限設定 -->
+    <bean id="accessDecisionManager" class="org.springframework.security.access.vote.UnanimousBased">
+        <constructor-arg>
+            <list>
+                <bean class="org.springframework.security.oauth2.provider.vote.ScopeVoter" />
+                <bean class="org.springframework.security.access.vote.RoleVoter" />
+                <bean class="org.springframework.security.access.vote.AuthenticatedVoter" />
+            </list>
+        </constructor-arg>
     </bean>
 
-    <bean id="oauthAuthenticationEntryPoint"
-          class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint">
-    </bean>
+    <bean id="myOAuthAuthenticationEntryPoint"
+          class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint" />
 
-    <bean id="clientAuthenticationEntryPoint"
+    <!-- <bean id="clientAuthenticationEntryPoint"
           class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint">
         <property name="realmName" value="springsec/client" />
         <property name="typeName" value="Basic" />
+    </bean> -->
+
+    <bean id="myOAuth2AuthenticationManager"
+          class="org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationManager">
+        <property name="tokenServices" ref="myTokenServices"/>
     </bean>
 
     <bean id="oauthAccessDeniedHandler"
-          class="org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler">
+          class="org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler" />
+    <!--
+    <bean id="logoutSuccessHandler" class="com.mycompany.apps.oauth2.authentication.security.LogoutImpl" >
+        <property name="tokenstore" ref="myTokenStore" />
     </bean>
+    -->
 
-    <bean id="clientCredentialsTokenEndpointFilter"
+    <bean id="myClientCredentialsTokenEndpointFilter"
           class="org.springframework.security.oauth2.provider.client.ClientCredentialsTokenEndpointFilter">
-        <property name="authenticationManager" ref="authenticationManager" />
+        <property name="authenticationManager" ref="myClientAuthenticationManager" />
+        <property name="authenticationEntryPoint" ref="myOAuthAuthenticationEntryPoint" />
     </bean>
 
+    <!-- ユーザアカウント 設定 -->
+    <!--
+    <authentication-manager id="userAuthenticationManager"
+                            xmlns="http://www.springframework.org/schema/security">
+        <authentication-provider  ref="customUserAuthenticationProvider" />
+    </authentication-manager>
+    <bean id="customUserAuthenticationProvider"
+          class="com.mycompany.apps.oauth2.authentication.security.CustomUserAuthenticationProvider">
+    </bean>
+    -->
+    <authentication-manager id="resourceOwner"
+                            xmlns="http://www.springframework.org/schema/security">
+        <authentication-provider>
+            <user-service id="userDetailsService">
+                <user name="user01" password="pass01" authorities="ROLE_USER" />
+                <user name="user02" password="pass02" authorities="ROLE_USER" />
+            </user-service>
+        </authentication-provider>
+    </authentication-manager>
+
+
+    <!-- ===== ===== -->
     <authentication-manager alias="authenticationManager"
                             xmlns="http://www.springframework.org/schema/security">
         <authentication-provider user-service-ref="clientDetailsUserService" />
     </authentication-manager>
-
     <bean id="clientDetailsUserService"
           class="org.springframework.security.oauth2.provider.client.ClientDetailsUserDetailsService">
         <constructor-arg ref="clientDetails" />
     </bean>
+    <bean id="clientDetails"
+          class="com.mycompany.apps.oauth2.authentication.security.ClientDetailsServiceImpl"/>
+    <!-- ===== ===== -->
 
-    <bean id="clientDetails" class="demo.oauth2.authentication.security.ClientDetailsServiceImpl"/>
-
-    <authentication-manager id="userAuthenticationManager"
+    <authentication-manager id="myClientAuthenticationManager"
                             xmlns="http://www.springframework.org/schema/security">
-        <authentication-provider  ref="customUserAuthenticationProvider">
-        </authentication-provider>
+        <authentication-provider user-service-ref="myClientDetailsUserService" />
     </authentication-manager>
-
-    <bean id="customUserAuthenticationProvider"
-          class="demo.oauth2.authentication.security.CustomUserAuthenticationProvider">
+    <bean id="myClientDetailsUserService"
+          class="org.springframework.security.oauth2.provider.client.ClientDetailsUserDetailsService">
+        <constructor-arg ref="myClientDetailsService" />
     </bean>
 
+    <!-- OAuth Provider 全体設定 -->
     <oauth:authorization-server
-        client-details-service-ref="clientDetails" token-services-ref="tokenServices">
+        client-details-service-ref="myClientDetailsService"
+        token-services-ref="myTokenServices"
+        user-approval-handler-ref="myUserApprovalHandler">
         <oauth:authorization-code />
         <oauth:implicit/>
         <oauth:refresh-token/>
         <oauth:client-credentials />
-        <oauth:password authentication-manager-ref="userAuthenticationManager"/>
+        <!--<oauth:password authentication-manager-ref="userAuthenticationManager" />-->
+        <oauth:password authentication-manager-ref="resourceOwner"/>
     </oauth:authorization-server>
-
-    <oauth:resource-server id="resourceServerFilter"
-                           resource-id="springsec" token-services-ref="tokenServices" />
-
-    <bean id="tokenStore"
-          class="org.springframework.security.oauth2.provider.token.InMemoryTokenStore" />
-
-    <bean id="tokenServices"
-          class="org.springframework.security.oauth2.provider.token.DefaultTokenServices">
-        <property name="tokenStore" ref="tokenStore" />
-        <property name="supportRefreshToken" value="true" />
-        <property name="accessTokenValiditySeconds" value="300000"></property>
-        <property name="clientDetailsService" ref="clientDetails" />
+    <bean id="myUserApprovalHandler"
+          class="org.springframework.security.oauth2.provider.approval.TokenServicesUserApprovalHandler">
+        <property name="tokenServices" ref="myTokenServices"/>
     </bean>
 
-    <bean id="dataSource"
+    <oauth:resource-server id="myOauth2ProviderFilter"
+                           resource-id="myResource" token-services-ref="myTokenServices" />
+
+    <bean id="myTokenServices"
+          class="org.springframework.security.oauth2.provider.token.DefaultTokenServices">
+        <property name="tokenStore" ref="myTokenStore" />
+        <property name="supportRefreshToken" value="true" />
+        <property name="accessTokenValiditySeconds" value="300000"></property>
+        <property name="clientDetailsService" ref="myClientDetailsService" />
+    </bean>
+
+    <!--<bean id="myTokenStore" class="org.springframework.security.oauth2.provider.token.InMemoryTokenStore" />-->
+    <bean id="myTokenStore"
+          class="org.springframework.security.oauth2.provider.token.JdbcTokenStore" >
+        <constructor-arg name="dataSource" ref="myDataSource"/>
+    </bean>
+
+    <!-- Request Token 設定 -->
+    <bean id="myAuthorizationCodeServices"
+          class="org.springframework.security.oauth2.provider.code.JdbcAuthorizationCodeServices" >
+        <constructor-arg name="dataSource" ref="myDataSource"/>
+    </bean>
+
+    <bean id="myDataSource"
           class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
         <!-- postgresql -->
         <property name="driverClassName" value="org.postgresql.Driver"/>
@@ -119,12 +190,11 @@
         <property name="password" value="p@ssw0rd"/>
     </bean>
 
-
     <!-- Declares explicit support for annotation-driven MVC controllers  @RequestMapping, @Controller -->
     <mvc:annotation-driven />
-
     <mvc:default-servlet-handler />
+    <context:component-scan base-package="com.mydomain" />
 
-    <bean id="MyResource" class="demo.oauth2.authentication.resources.MyResource"></bean>
+    <bean id="MyResource" class="com.mycompany.apps.oauth2.authentication.resources.MyResource"></bean>
 
 </beans>

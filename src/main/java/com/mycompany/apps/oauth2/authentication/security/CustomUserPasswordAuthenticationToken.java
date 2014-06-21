@@ -1,4 +1,4 @@
-package demo.oauth2.authentication.security;
+package com.mycompany.apps.oauth2.authentication.security;
 
 import java.util.Collection;
 
@@ -20,8 +20,7 @@ public class CustomUserPasswordAuthenticationToken extends AbstractAuthenticatio
         this.loginId = loginId;
     }
 
-    public CustomUserPasswordAuthenticationToken(Object principal,
-            Object credentials) {
+    public CustomUserPasswordAuthenticationToken(Object principal, Object credentials) {
         super(null);
         this.principal = principal;
         this.credentials = credentials;

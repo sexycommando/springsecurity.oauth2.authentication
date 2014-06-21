@@ -1,4 +1,4 @@
-package demo.oauth2.authentication.security;
+package com.mycompany.apps.oauth2.authentication.security;
 
 import java.util.ArrayList;
 import java.util.Collection;
