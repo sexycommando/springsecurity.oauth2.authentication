@@ -203,7 +203,7 @@
 
     <!--
     ============================================================
-       Begin RESTful JAX-RS Application Setting
+       Begin JAX-RS RESTful Application Setting
     ============================================================
     -->
     <!-- Declares explicit support for annotation-driven MVC controllers  @RequestMapping, @Controller -->
