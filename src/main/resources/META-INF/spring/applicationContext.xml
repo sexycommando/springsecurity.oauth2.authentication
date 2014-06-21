@@ -20,7 +20,7 @@
 		                   http://www.springframework.org/schema/beans
                            http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
 						   http://www.springframework.org/schema/tx
-						   http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+						   http://www.springframework.org/schema/tx/spring-tx-3.2.xsd">
 
     <!--
     ============================================================
@@ -120,12 +120,18 @@
     -->
     <authentication-manager id="resourceOwner"
                             xmlns="http://www.springframework.org/schema/security">
+        <authentication-provider user-service-ref="userDetailsService">
+            <password-encoder hash="sha-256"/>
+            <!-- <password-encoder ref="passwordEncoder"/> --> <!-- use BCrypt -->
+        </authentication-provider>
+        <!--
         <authentication-provider>
             <user-service id="userDetailsService">
                 <user name="user01" password="pass01" authorities="ROLE_USER" />
                 <user name="user02" password="pass02" authorities="ROLE_USER" />
             </user-service>
         </authentication-provider>
+        -->
     </authentication-manager>
 
 
@@ -189,6 +195,10 @@
         <constructor-arg name="dataSource" ref="myDataSource"/>
     </bean>
 
+    <bean id="userDetailsService"
+          class="com.mycompany.apps.domain.services.UserDetailsServiceImpl" />
+    <bean id="passwordEncoder"
+          class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
 
 
     <!--
@@ -210,7 +220,7 @@
     <tx:annotation-driven transaction-manager="transactionManager"/>
 
     <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-        <property name="dataSource" ref="dataSource"></property>
+        <property name="dataSource" ref="myDataSource"></property>
     </bean>
 
     <bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
@@ -234,15 +244,5 @@
         <property name="username" value="${jdbc.username}"></property>
         <property name="password" value="${jdbc.password}"></property>
     </bean>
-
-    <!--
-    <bean id="myDataSource"
-          class="org.apache.commons.dbcp.BasicDataSource" destroy-method="close">
-        <property name="driverClassName" value="org.postgresql.Driver"/>
-        <property name="url" value="jdbc:postgresql://localhost:5432/medbook"/>
-        <property name="username" value="medbook"/>
-        <property name="password" value="p@ssw0rd"/>
-    </bean>
-    -->
 
 </beans>

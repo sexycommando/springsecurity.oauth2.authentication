@@ -6,10 +6,20 @@
          id="WebApp_ID" version="3.0">
 
     <display-name>Spring Secure REST</display-name>
+
     <context-param>
         <param-name>contextConfigLocation</param-name>
-        <param-value>/WEB-INF/spring-servlet.xml</param-value>
+        <param-value>
+            classpath:/META-INF/spring/applicationContext.xml
+        </param-value>
     </context-param>
+    <!--
+        <context-param>
+            <param-name>contextConfigLocation</param-name>
+            <param-value>/WEB-INF/spring-servlet.xml</param-value>
+        </context-param>
+    -->
+
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
     </listener>
