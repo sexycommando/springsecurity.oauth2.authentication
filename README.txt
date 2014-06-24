@@ -1,5 +1,21 @@
-@see
-http://www.e-zest.net/blog/rest-authentication-using-oauth-2-0-resource-owner-password-flow-protocol/
+■主要なエラー
+HTTP/1.1 400 Bad Request
+{"error":"invalid_grant",
+"error_description":"Bad credentials"
+}
+
+HTTP/1.1 401 Unauthorized
+{
+"error":"invalid_token",
+"error_description":"Invalid access token: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+"error_description":"Access token expired: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+"error_description":"Client not valid: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+"error_description":"Invalid access token (no client id): xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+"error_description":"Invalid refresh token (expired): xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+}
+
+
+
 
 
 アクセストークンの取得

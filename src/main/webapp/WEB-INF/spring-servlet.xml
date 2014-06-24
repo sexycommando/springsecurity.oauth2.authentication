@@ -190,8 +190,8 @@
         <property name="tokenStore" ref="myTokenStore" />
         <property name="supportRefreshToken" value="true" />
         <!-- token validity second setting -->
-        <property name="accessTokenValiditySeconds" value="300000"></property> <!-- default 12 hours. -->
-        <property name="refreshTokenValiditySeconds" value="300000"></property> <!-- default 30 days. -->
+        <property name="accessTokenValiditySeconds" value="43200"></property> <!-- default 12 hours. -->
+        <property name="refreshTokenValiditySeconds" value="2592000"></property> <!-- default 30 days. -->
         <property name="clientDetailsService" ref="myClientDetailsService" />
     </bean>
 
