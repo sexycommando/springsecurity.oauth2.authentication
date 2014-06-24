@@ -22,7 +22,6 @@
 						   http://www.springframework.org/schema/tx
 						   http://www.springframework.org/schema/tx/spring-tx-3.2.xsd">
 
-
     <!--
     ============================================================
        Begin OAuth2 Authentication Setting
@@ -47,48 +46,32 @@
         <anonymous enabled="false" />
         <custom-filter ref="myClientCredentialsTokenEndpointFilter" before="BASIC_AUTH_FILTER" />
         <access-denied-handler ref="oauthAccessDeniedHandler" />
-        <!--<http-basic entry-point-ref="clientAuthenticationEntryPoint" />-->
+        <!-- TODO START -->
+        <http-basic entry-point-ref="clientAuthenticationEntryPoint" />
+        <!-- TODO END -->
     </http>
+
+    <bean id="clientAuthenticationEntryPoint"
+          class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint">
+        <property name="realmName" value="medbook/client" />
+        <property name="typeName" value="Basic" />
+    </bean>
 
     <http pattern="/logout" create-session="never"
           entry-point-ref="myOAuthAuthenticationEntryPoint"
           xmlns="http://www.springframework.org/schema/security">
         <anonymous enabled="false" />
         <intercept-url pattern="/logout" method="GET" />
-        <!--<sec:logout invalidate-session="true" logout-url="/logout" success-handler-ref="logoutSuccessHandler" />-->
+        <logout invalidate-session="true" logout-url="/logout" success-handler-ref="logoutSuccessHandler" />
         <custom-filter ref="myOauth2ProviderFilter" before="PRE_AUTH_FILTER" />
         <access-denied-handler ref="oauthAccessDeniedHandler" />
     </http>
-
-    <!-- 連携アプリ設定 -->
-    <oauth:client-details-service id="myClientDetailsService" >
-        <oauth:client client-id="my-auth"
-                      secret="pass123"
-                      scope="trust"
-                      authorized-grant-types="authorization_code,implicit,password,client_credentials,refresh_token"
-                      authorities="ROLE_CLIENT"
-                      resource-ids="myResource" />
-    </oauth:client-details-service>
-
-    <!-- 権限設定 -->
-    <bean id="accessDecisionManager" class="org.springframework.security.access.vote.UnanimousBased">
-        <constructor-arg>
-            <list>
-                <bean class="org.springframework.security.oauth2.provider.vote.ScopeVoter" />
-                <bean class="org.springframework.security.access.vote.RoleVoter" />
-                <bean class="org.springframework.security.access.vote.AuthenticatedVoter" />
-            </list>
-        </constructor-arg>
+    <bean id="logoutSuccessHandler" class="com.mycompany.apps.oauth2.authentication.security.LogoutImpl" >
+        <property name="tokenstore" ref="myTokenStore" />
     </bean>
 
     <bean id="myOAuthAuthenticationEntryPoint"
           class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint" />
-
-    <!-- <bean id="clientAuthenticationEntryPoint"
-          class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint">
-        <property name="realmName" value="springsec/client" />
-        <property name="typeName" value="Basic" />
-    </bean> -->
 
     <bean id="myOAuth2AuthenticationManager"
           class="org.springframework.security.oauth2.provider.authentication.OAuth2AuthenticationManager">
@@ -97,11 +80,6 @@
 
     <bean id="oauthAccessDeniedHandler"
           class="org.springframework.security.oauth2.provider.error.OAuth2AccessDeniedHandler" />
-    <!--
-    <bean id="logoutSuccessHandler" class="com.mycompany.apps.oauth2.authentication.security.LogoutImpl" >
-        <property name="tokenstore" ref="myTokenStore" />
-    </bean>
-    -->
 
     <bean id="myClientCredentialsTokenEndpointFilter"
           class="org.springframework.security.oauth2.provider.client.ClientCredentialsTokenEndpointFilter">
@@ -109,9 +87,18 @@
         <property name="authenticationEntryPoint" ref="myOAuthAuthenticationEntryPoint" />
     </bean>
 
-    <!-- ユーザアカウント 設定 -->
-    <!--
-    <authentication-manager id="userAuthenticationManager"
+    <authentication-manager alias="myClientAuthenticationManager"
+                            xmlns="http://www.springframework.org/schema/security">
+        <authentication-provider user-service-ref="myClientDetailsUserService" />
+    </authentication-manager>
+    <bean id="myClientDetailsUserService"
+          class="org.springframework.security.oauth2.provider.client.ClientDetailsUserDetailsService">
+        <constructor-arg ref="myClientDetailsService" />
+    </bean>
+
+    <!-- ===== ユーザ認証設定 ===== -->
+    <!-- 独自にユーザ認証を実装する場合...
+    <authentication-manager id="resourceOwner"
                             xmlns="http://www.springframework.org/schema/security">
         <authentication-provider  ref="customUserAuthenticationProvider" />
     </authentication-manager>
@@ -125,49 +112,70 @@
             <password-encoder hash="sha-256"/>
             <!-- <password-encoder ref="passwordEncoder"/> --> <!-- use BCrypt -->
         </authentication-provider>
-        <!--
-        <authentication-provider>
-            <user-service id="userDetailsService">
-                <user name="user01" password="pass01" authorities="ROLE_USER" />
-                <user name="user02" password="pass02" authorities="ROLE_USER" />
-            </user-service>
-        </authentication-provider>
-        -->
     </authentication-manager>
 
+    <bean id="userDetailsService"
+          class="com.mycompany.apps.domain.services.UserDetailsServiceImpl" />
 
-    <!-- ===== ===== -->
-    <authentication-manager alias="authenticationManager"
-                            xmlns="http://www.springframework.org/schema/security">
-        <authentication-provider user-service-ref="clientDetailsUserService" />
-    </authentication-manager>
-    <bean id="clientDetailsUserService"
-          class="org.springframework.security.oauth2.provider.client.ClientDetailsUserDetailsService">
-        <constructor-arg ref="clientDetails" />
+    <bean id="passwordEncoder"
+          class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
+
+
+    <!-- ===== クライアント認証設定 ===== -->
+    <!--　独自にクライアント認証を実装する場合...
+        <authentication-manager alias="authenticationManager"
+                                xmlns="http://www.springframework.org/schema/security">
+            <authentication-provider user-service-ref="myClientDetailsUserService" />
+        </authentication-manager>
+        <bean id="myClientDetailsUserService"
+              class="org.springframework.security.oauth2.provider.client.ClientDetailsUserDetailsService">
+            <constructor-arg ref="myClientDetailsService" />
+        </bean>
+        <bean id="myClientDetailsService"
+              class="com.mycompany.apps.oauth2.authentication.security.ClientDetailsServiceImpl"/>
+    -->
+    <!-- ===== クライアント認証設定 ===== -->
+    <oauth:client-details-service id="myClientDetailsService" >
+        <oauth:client client-id="my-auth"
+                      secret="pass123"
+                      scope="trust"
+                      authorized-grant-types="authorization_code,implicit,password,client_credentials,refresh_token"
+                      authorities="ROLE_CLIENT"
+                      resource-ids="myResource" />
+    </oauth:client-details-service>
+
+    <!-- ===== 権限設定 ===== -->
+    <bean id="accessDecisionManager" class="org.springframework.security.access.vote.UnanimousBased">
+        <constructor-arg>
+            <list>
+                <bean class="org.springframework.security.oauth2.provider.vote.ScopeVoter" />
+                <bean class="org.springframework.security.access.vote.RoleVoter" />
+                <bean class="org.springframework.security.access.vote.AuthenticatedVoter" />
+            </list>
+        </constructor-arg>
     </bean>
-    <bean id="clientDetails"
-          class="com.mycompany.apps.oauth2.authentication.security.ClientDetailsServiceImpl"/>
-    <!-- ===== ===== -->
 
-    <authentication-manager id="myClientAuthenticationManager"
-                            xmlns="http://www.springframework.org/schema/security">
-        <authentication-provider user-service-ref="myClientDetailsUserService" />
-    </authentication-manager>
-    <bean id="myClientDetailsUserService"
-          class="org.springframework.security.oauth2.provider.client.ClientDetailsUserDetailsService">
-        <constructor-arg ref="myClientDetailsService" />
-    </bean>
 
-    <!-- OAuth Provider 全体設定 -->
+    <!-- ===== OAuth Provider 全体設定 ===== -->
+    <!--
+        4つのグラントタイプ を設定可能
+          - 認可コード: authorization-code
+          - インプリシット: implicit
+          - リソースオーナーパスワードクレデンシャル: password
+          - クライアントクレデンシャル: client-credentials
+        今回は、リソースオーナーパスワードクレデンシャルの設定のみとする。
+    -->
     <oauth:authorization-server
         client-details-service-ref="myClientDetailsService"
         token-services-ref="myTokenServices"
         user-approval-handler-ref="myUserApprovalHandler">
-        <oauth:authorization-code />
-        <oauth:implicit/>
-        <oauth:refresh-token/>
-        <oauth:client-credentials />
         <oauth:password authentication-manager-ref="resourceOwner"/>
+        <!--
+        <oauth:authorization-code />
+        <oauth:implicit />
+        <oauth:refresh-token />
+        <oauth:client-credentials />
+        -->
     </oauth:authorization-server>
     <bean id="myUserApprovalHandler"
           class="org.springframework.security.oauth2.provider.approval.TokenServicesUserApprovalHandler">
@@ -181,6 +189,7 @@
           class="org.springframework.security.oauth2.provider.token.DefaultTokenServices">
         <property name="tokenStore" ref="myTokenStore" />
         <property name="supportRefreshToken" value="true" />
+        <!-- token validity second setting -->
         <property name="accessTokenValiditySeconds" value="300000"></property>
         <property name="clientDetailsService" ref="myClientDetailsService" />
     </bean>
@@ -190,16 +199,13 @@
         <constructor-arg name="dataSource" ref="myDataSource"/>
     </bean>
 
-    <!-- Request Token 設定 -->
+    <!-- ===== Request Token 設定 ===== -->
+    <!-- 認可コードグラントを使用する場合、必要となる設定  -->
     <bean id="myAuthorizationCodeServices"
           class="org.springframework.security.oauth2.provider.code.JdbcAuthorizationCodeServices" >
         <constructor-arg name="dataSource" ref="myDataSource"/>
     </bean>
 
-    <bean id="userDetailsService"
-          class="com.mycompany.apps.domain.services.UserDetailsServiceImpl" />
-    <bean id="passwordEncoder"
-          class="org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder" />
 
 
     <!--

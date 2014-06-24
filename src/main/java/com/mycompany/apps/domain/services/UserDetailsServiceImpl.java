@@ -23,12 +23,16 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author stnetadmin
  */
 public class UserDetailsServiceImpl implements UserDetailsService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(UserDetailsServiceImpl.class);
 
     @Autowired
     private UsersMapper usersMapper;
