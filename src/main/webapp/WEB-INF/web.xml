@@ -6,19 +6,19 @@
          id="WebApp_ID" version="3.0">
 
     <display-name>Spring Secure REST</display-name>
-    <!--
+
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>
             classpath:/META-INF/spring/applicationContext.xml
         </param-value>
     </context-param>
-    -->
+    <!--
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>/WEB-INF/spring-servlet.xml</param-value>
     </context-param>
-
+    -->
 
     <listener>
         <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
@@ -29,15 +29,13 @@
     <filter>
         <filter-name>springSecurityFilterChain</filter-name>
         <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-        <init-param>
-            <param-name>contextAttribute</param-name>
-            <param-value>org.springframework.web.servlet.FrameworkServlet.CONTEXT.spring</param-value>
-        </init-param>
     </filter>
     <filter-mapping>
         <filter-name>springSecurityFilterChain</filter-name>
         <url-pattern>/*</url-pattern>
     </filter-mapping>
+
+    <!-- JAX-RS(Jersey) -->
     <servlet>
         <servlet-name>REST Service</servlet-name>
         <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
@@ -61,5 +59,5 @@
         <servlet-name>spring</servlet-name>
         <url-pattern>/</url-pattern>
     </servlet-mapping>
-   
+
 </web-app>

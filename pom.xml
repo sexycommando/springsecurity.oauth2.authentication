@@ -40,7 +40,7 @@
         <commons.dbcp.version>1.4</commons.dbcp.version>
         <commons.pool.version>1.6</commons.pool.version>
         <commons.lang.version>2.6</commons.lang.version>
-        <jersey-version>1.11</jersey-version>
+        <jersey-version>1.18.1</jersey-version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -202,6 +202,7 @@
         </dependency>
         <!-- == End Commons Library == -->
 
+        <!-- ===== Begin JAX-RS(Jersey) -->
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
@@ -249,6 +250,7 @@
             <artifactId>jersey-client</artifactId>
             <version>${jersey-version}</version>
         </dependency>
+        <!-- ===== End JAX-RS(Jersey) -->
 
 
         <!-- == Begin Servlet APIs == -->
