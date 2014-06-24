@@ -97,7 +97,7 @@
     </bean>
 
     <!-- ===== ユーザ認証設定 ===== -->
-    <!-- 独自にユーザ認証を実装する場合...
+    <!-- 独自にユーザ認証を実装する場合はこんな感じで...
     <authentication-manager id="resourceOwner"
                             xmlns="http://www.springframework.org/schema/security">
         <authentication-provider  ref="customUserAuthenticationProvider" />
@@ -122,7 +122,7 @@
 
 
     <!-- ===== クライアント認証設定 ===== -->
-    <!--　独自にクライアント認証を実装する場合...
+    <!--　独自にクライアント認証を実装する場合はこんな感じで...
         <authentication-manager alias="authenticationManager"
                                 xmlns="http://www.springframework.org/schema/security">
             <authentication-provider user-service-ref="myClientDetailsUserService" />
@@ -190,7 +190,8 @@
         <property name="tokenStore" ref="myTokenStore" />
         <property name="supportRefreshToken" value="true" />
         <!-- token validity second setting -->
-        <property name="accessTokenValiditySeconds" value="300000"></property>
+        <property name="accessTokenValiditySeconds" value="300000"></property> <!-- default 12 hours. -->
+        <property name="refreshTokenValiditySeconds" value="300000"></property> <!-- default 30 days. -->
         <property name="clientDetailsService" ref="myClientDetailsService" />
     </bean>
 
