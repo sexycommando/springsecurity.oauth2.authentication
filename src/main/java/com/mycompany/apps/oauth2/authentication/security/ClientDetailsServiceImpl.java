@@ -26,6 +26,8 @@ import org.springframework.security.oauth2.provider.NoSuchClientException;
 import org.springframework.stereotype.Service;
 
 /**
+ * クライアント(アプリ)の認証を行うカスタムクラスです。<br>
+ * 独自にクライアントの認証を行いたい場合はこのクラスを使用してください。
  *
  * @author stnetadmin
  */

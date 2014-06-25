@@ -20,6 +20,8 @@ import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 
 /**
+ * 認証プロバイダのカスタムクラスです。<br>
+ * 独自にユーザ認証を行いたい場合はこのクラスを使用してください。
  *
  * @author stnetadmin
  */

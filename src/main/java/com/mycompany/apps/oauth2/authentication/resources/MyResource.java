@@ -9,19 +9,19 @@ public class MyResource {
     @GET
     @Path("/createInfo")
     public String createInfo() {
-        return "Protected Resource(createInfo) Accessed !!!! Returning from Myresource createInfo";
+        return "\n\tProtected Resource(createInfo) Accessed !!!! Returning from Myresource createInfo";
     }
 
     @GET
     @Path("/getMyInfo")
     public String getMyInfo() {
-        return "Protected Resource(getMyInfo) Accessed !!!! Returning from Myresource getMyInfo";
+        return "\n\tProtected Resource(getMyInfo) Accessed !!!! Returning from Myresource getMyInfo";
     }
 
     @GET
     @Path("/updateInfo")
     public String updateMyInfo() {
-        return "Protected Resource(updateInfo) Accessed !!!! Returning from Myresource updateInfo";
+        return "\n\tProtected Resource(updateInfo) Accessed !!!! Returning from Myresource updateInfo";
     }
 
 }

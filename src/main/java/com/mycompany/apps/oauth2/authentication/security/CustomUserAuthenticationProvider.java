@@ -25,6 +25,8 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 
 /**
+ * エンドユーザの認証を行うカスタムクラスです。<br>
+ * 独自にユーザ認証を行いたい場合はこのクラスを使用してください。
  *
  * @author stnetadmin
  */
