@@ -25,6 +25,22 @@
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
+
+            <plugin>
+                <groupId>com.google.code.maven-license-plugin</groupId>
+                <artifactId>maven-license-plugin</artifactId>
+                <version>${com.google.code.maven-license-plugin.version}</version>
+                <configuration>
+                    <header>src/etc/header.txt</header>
+                    <includes>
+                        <include>src/**/*.java</include>
+                    </includes>
+                    <encoding>${project.build.sourceEncoding}</encoding>
+                    <headerDefinitions>
+                        <headerDefinition>src/etc/header-definition.xml</headerDefinition>
+                    </headerDefinitions>
+                </configuration>
+            </plugin>
         </plugins>
     </build>
     <properties>
@@ -43,6 +59,7 @@
         <jersey-version>1.18.1</jersey-version>
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
+        <com.google.code.maven-license-plugin.version>1.4.0</com.google.code.maven-license-plugin.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 

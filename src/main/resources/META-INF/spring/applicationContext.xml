@@ -30,7 +30,6 @@
     <!-- Declares explicit support for annotation-driven MVC controllers  @RequestMapping, @Controller -->
     <mvc:annotation-driven />
     <mvc:default-servlet-handler />
-    <bean id="MyResource" class="com.mycompany.apps.oauth2.authentication.resources.MyResource"></bean>
 
     <context:annotation-config />
 
@@ -73,17 +72,21 @@
        Begin OAuth2 Authentication Setting
     ============================================================
     -->
-    <http pattern="/resources/**" create-session="never"
+    <!-- ===== Begin Protected Area setting ===== -->
+    <http pattern="/api/member/**" create-session="never"
           entry-point-ref="myOAuthAuthenticationEntryPoint"
           authentication-manager-ref="myOAuth2AuthenticationManager"
           access-decision-manager-ref="accessDecisionManager"
           xmlns="http://www.springframework.org/schema/security">
         <anonymous enabled="false" />
-        <intercept-url pattern="/resources/**" access="SCOPE_TRUST" />
+        <intercept-url pattern="/api/member/**" access="SCOPE_TRUST" />
         <custom-filter ref="myOauth2ProviderFilter" before="PRE_AUTH_FILTER" />
         <access-denied-handler ref="oauthAccessDeniedHandler" />
     </http>
+    <!-- ===== End Protected Area setting ===== -->
 
+
+    <!-- ===== Begin OAuth2 token management setting ===== -->
     <http pattern="/oauth/token" create-session="stateless"
           entry-point-ref="myOAuthAuthenticationEntryPoint"
           authentication-manager-ref="myClientAuthenticationManager"
@@ -96,6 +99,8 @@
         <http-basic entry-point-ref="clientAuthenticationEntryPoint" />
         <!-- TODO END -->
     </http>
+    <!-- ===== End OAuth2 token management setting ===== -->
+
 
     <bean id="clientAuthenticationEntryPoint"
           class="org.springframework.security.oauth2.provider.error.OAuth2AuthenticationEntryPoint">

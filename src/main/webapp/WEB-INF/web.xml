@@ -29,19 +29,21 @@
         <url-pattern>/*</url-pattern>
     </filter-mapping>
 
-    <!-- JAX-RS(Jersey) -->
+    <!-- ===== JAX-RS(Jersey) ===== -->
     <servlet>
         <servlet-name>REST Service</servlet-name>
         <servlet-class>com.sun.jersey.spi.container.servlet.ServletContainer</servlet-class>
         <init-param>
             <param-name>com.sun.jersey.config.property.packages</param-name>
-            <param-value>com.mycompany.apps.oauth2.authentication.resources</param-value>
+            <!-- ===== Begin Resource Class Setting ===== -->
+            <param-value>com.mycompany.apps.web.resources</param-value>
+            <!-- ===== End Resource Class Setting ===== -->
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
     <servlet-mapping>
         <servlet-name>REST Service</servlet-name>
-        <url-pattern>/resources/*</url-pattern>
+        <url-pattern>/api/*</url-pattern>
     </servlet-mapping>
 
     <servlet>
