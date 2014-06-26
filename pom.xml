@@ -25,7 +25,6 @@
                     <encoding>${project.build.sourceEncoding}</encoding>
                 </configuration>
             </plugin>
-
             <plugin>
                 <groupId>com.google.code.maven-license-plugin</groupId>
                 <artifactId>maven-license-plugin</artifactId>
@@ -51,6 +50,7 @@
         <logback.version>1.1.2</logback.version>
         <jackson-json.version>2.4.0</jackson-json.version>
         <mybatis.version>3.2.7</mybatis.version>
+        <postgresql.version>9.1-901.jdbc4</postgresql.version>
         <mybatis-spring.version>1.2.2</mybatis-spring.version>
         <aspectj.version>1.8.0</aspectj.version>
         <commons.dbcp.version>1.4</commons.dbcp.version>
@@ -64,7 +64,7 @@
     </properties>
 
     <dependencies>
-        <!-- == Begin Spring == -->
+        <!-- ===== Begin Spring ===== -->
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
@@ -137,9 +137,9 @@
             <version>${spring.version}</version>
             <scope>test</scope>
         </dependency>
-        <!-- == End Spring == -->
+        <!-- ===== End Spring ==== -->
 
-        <!-- == Begin AOP == -->
+        <!-- ===== Begin AOP ===== -->
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
@@ -150,9 +150,9 @@
             <artifactId>aspectjweaver</artifactId>
             <version>${aspectj.version}</version>
         </dependency>
-        <!-- == End AOP == -->
+        <!-- ===== End AOP ===== -->
 
-        <!-- == Begin Spring Security == -->
+        <!-- ===== Begin Spring Security ===== -->
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-core</artifactId>
@@ -178,17 +178,26 @@
             <artifactId>spring-security-taglibs</artifactId>
             <version>${springsec.version}</version>
         </dependency>
-        <!-- == End Spring Security == -->
+        <!-- ===== End Spring Security ===== -->
 
-        <!-- == Begin Spring OAuth2 == -->
+        <!-- ===== Begin Spring OAuth2 ===== -->
         <dependency>
             <groupId>org.springframework.security.oauth</groupId>
             <artifactId>spring-security-oauth2</artifactId>
             <version>${springoauth2.version}</version>
         </dependency>
-        <!-- == End Spring OAuth2 == -->
+        <!-- ===== End Spring OAuth2 ===== -->
 
-        <!-- == Begin MyBatis -->
+        <!-- == Begin Database == -->
+        <dependency>
+            <groupId>postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>${postgresql.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        <!-- == End Database == -->
+
+        <!-- ===== Begin MyBatis ===== -->
         <dependency>
             <groupId>org.mybatis</groupId>
             <artifactId>mybatis</artifactId>
@@ -199,9 +208,9 @@
             <artifactId>mybatis-spring</artifactId>
             <version>${mybatis-spring.version}</version>
         </dependency>
-        <!-- == End MyBatis -->
+        <!-- ===== End MyBatis ===== -->
 
-        <!-- == Begin Commons Library == -->
+        <!-- ===== Begin Commons Library ===== -->
         <dependency>
             <groupId>commons-dbcp</groupId>
             <artifactId>commons-dbcp</artifactId>
@@ -217,9 +226,9 @@
             <artifactId>commons-pool</artifactId>
             <version>${commons.pool.version}</version>
         </dependency>
-        <!-- == End Commons Library == -->
+        <!-- ===== End Commons Library ===== -->
 
-        <!-- ===== Begin JAX-RS(Jersey) -->
+        <!-- ===== Begin JAX-RS(Jersey) ===== -->
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
@@ -262,15 +271,9 @@
             <artifactId>jersey-json</artifactId>
             <version>${jersey-version}</version>
         </dependency>
-        <dependency>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-client</artifactId>
-            <version>${jersey-version}</version>
-        </dependency>
-        <!-- ===== End JAX-RS(Jersey) -->
+        <!-- ===== End JAX-RS(Jersey) ===== -->
 
-
-        <!-- == Begin Servlet APIs == -->
+        <!-- ===== Begin Servlet APIs ===== -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>javax.servlet-api</artifactId>
@@ -282,9 +285,9 @@
             <artifactId>jstl</artifactId>
             <version>1.2</version>
         </dependency>
-        <!-- == End Servlet APIs == -->
+        <!-- ===== End Servlet APIs ===== -->
 
-
+        <!-- ===== Begin logging APIs ===== -->
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
@@ -311,12 +314,28 @@
             <artifactId>hibernate-validator</artifactId>
             <version>5.1.1.Final</version>
         </dependency>
+        <!-- ===== End logging APIs ===== -->
+
+        <!-- ===== Begin Test ===== -->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.11</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>${jersey-version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey.jersey-test-framework</groupId>
+            <artifactId>jersey-test-framework-http</artifactId>
+            <version>${jersey-version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- ===== End Test ===== -->
+
     </dependencies>
 
 </project>

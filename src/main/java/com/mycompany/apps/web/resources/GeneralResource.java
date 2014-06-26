@@ -17,6 +17,7 @@ package com.mycompany.apps.web.resources;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.QueryParam;
 
 @Path("/test")
 public class GeneralResource {
@@ -27,4 +28,9 @@ public class GeneralResource {
         return "\n\tGeneral Resource(getMyInfo) Accessed !!!! Returning from Myresource getMyInfo";
     }
 
+    @GET
+    public String say(
+            @QueryParam("name") String name) {
+        return "Hello, " + name + "!";
+    }
 }
