@@ -220,13 +220,11 @@
         client-details-service-ref="myClientDetailsService"
         token-services-ref="myTokenServices"
         user-approval-handler-ref="myUserApprovalHandler">
+        <oauth:authorization-code></oauth:authorization-code>
+        <oauth:implicit></oauth:implicit>
+        <oauth:refresh-token></oauth:refresh-token>
+        <oauth:client-credentials></oauth:client-credentials>
         <oauth:password authentication-manager-ref="resourceOwner"/>
-        <!--
-        <oauth:authorization-code />
-        <oauth:implicit />
-        <oauth:refresh-token />
-        <oauth:client-credentials />
-        -->
     </oauth:authorization-server>
     <bean id="myUserApprovalHandler"
           class="org.springframework.security.oauth2.provider.approval.TokenServicesUserApprovalHandler">
