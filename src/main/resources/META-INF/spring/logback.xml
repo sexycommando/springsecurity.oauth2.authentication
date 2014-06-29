@@ -10,7 +10,7 @@
         </encoder>
     </appender>
 
-    <logger name="com.sivalabs" level="DEBUG" additivity="false">
+    <logger name="com.mycompany" level="DEBUG" additivity="false">
         <appender-ref ref="STDOUT" />
     </logger>
 
